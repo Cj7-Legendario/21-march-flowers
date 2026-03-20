@@ -3,23 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SYSTEM 21/03 - BY CJ7-LEGENDARIO</title>
+    <title>SYSTEM 21/03 LEGENDARIO - BY CJ7</title>
     <style>
-        :root { --main-color: #fbff00; --bg-dark: #0a0a0a; --process-bg: #0d1117; }
+        :root { --main-color: #fbff00; --bg-dark: #0a0a0a; --process-bg: #0d1117; --star-color: #4a90e2; }
         
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: var(--bg-dark); color: white;
+            background: radial-gradient(circle at center, #111827 0%, #000000 100%);
+            color: white;
             font-family: 'Courier New', monospace;
             overflow: hidden; display: flex; justify-content: center; align-items: center;
+            touch-action: none;
+        }
+
+        /* Fondo Estrellado CSS para las primeras pantallas */
+        .bg-stars {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><circle cx="400" cy="300" r="1" fill="white" opacity="0.5"/><circle cx="200" cy="100" r="1.5" fill="white" opacity="0.3"/><circle cx="600" cy="500" r="2" fill="%23fbff00" opacity="0.2"/><circle cx="700" cy="200" r="1" fill="white" opacity="0.4"/><circle cx="100" cy="400" r="1.5" fill="white" opacity="0.6"/><circle cx="300" cy="500" r="1" fill="%23fbff00" opacity="0.3"/></svg>') repeat;
+            background-size: 400px 300px;
+            animation: float-stars 60s linear infinite;
+            z-index: 1; pointer-events: none; opacity: 0.6;
+        }
+        @keyframes float-stars { from { background-position: 0 0; } to { background-position: -400px -300px; } }
+
+        /* Efecto Glassmorphism (Panel de cristal) */
+        .glass-panel {
+            background: rgba(15, 20, 30, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(251, 255, 0, 0.15);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(251, 255, 0, 0.05);
+            width: 85%;
+            max-width: 400px;
+            z-index: 10;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
         /* Barra de Estado Superior */
         #status-bar {
             position: absolute; top: 0; width: 100%; padding: 10px 20px;
             display: flex; justify-content: space-between; box-sizing: border-box;
-            background: rgba(0,0,0,0.5); font-size: 0.8rem; color: var(--main-color);
+            background: rgba(0,0,0,0.7); font-size: 0.7rem; color: var(--main-color);
             border-bottom: 1px solid var(--main-color); z-index: 100;
+            transition: opacity 0.5s;
         }
 
         .screen { 
@@ -29,103 +57,193 @@
         }
         .active { display: flex; }
 
-        /* Estilo Consola */
-        .terminal { color: var(--main-color); padding: 20px; text-transform: uppercase; }
+        /* Terminal Styles */
+        .terminal { color: var(--main-color); padding: 10px; text-transform: uppercase; }
         .blink { animation: blinker 0.8s infinite; cursor: pointer;}
         @keyframes blinker { 50% { opacity: 0; } }
 
         input { 
-            background: transparent; border: 2px solid var(--main-color); 
+            background: rgba(0, 0, 0, 0.5); border: 1px solid var(--main-color); 
             color: white; padding: 15px; font-size: 1.2rem; outline: none; 
-            border-radius: 8px; margin-bottom: 20px; width: 70%; text-align: center;
+            border-radius: 8px; margin-bottom: 20px; width: 80%; text-align: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            transition: all 0.3s ease;
         }
+        input:focus { box-shadow: 0 0 15px rgba(251, 255, 0, 0.3), inset 0 0 10px rgba(0,0,0,0.8); }
+        
         .btn { 
-            background: transparent; border: 2px solid var(--main-color); color: var(--main-color); 
-            padding: 15px 30px; font-weight: bold; cursor: pointer; border-radius: 8px;
-            text-transform: uppercase; transition: 0.3s;
+            background: rgba(251, 255, 0, 0.1); border: 1px solid var(--main-color); color: var(--main-color); 
+            padding: 12px 30px; font-weight: bold; cursor: pointer; border-radius: 8px;
+            text-transform: uppercase; transition: 0.3s; margin: 5px; letter-spacing: 1px;
         }
-        .btn:hover { background: var(--main-color); color: black; box-shadow: 0 0 20px var(--main-color); }
+        .btn:hover { background: var(--main-color); color: black; box-shadow: 0 0 20px var(--main-color); transform: translateY(-2px); }
 
-        .progress-box { width: 80%; max-width: 300px; height: 12px; background: #222; border-radius: 10px; margin-top: 20px; overflow: hidden; border: 1px solid var(--main-color); }
-        .bar { width: 0%; height: 100%; background: var(--main-color); transition: width 0.1s linear; }
+        .progress-box { width: 100%; height: 8px; background: rgba(0,0,0,0.5); border-radius: 10px; margin-top: 20px; overflow: hidden; border: 1px solid rgba(251, 255, 0, 0.3); }
+        .bar { width: 0%; height: 100%; background: var(--main-color); box-shadow: 0 0 10px var(--main-color); }
 
         #finale-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
+        
         #final-msg { 
-            position: absolute; bottom: 12%; font-size: 1.8rem; font-weight: bold; 
+            position: absolute; bottom: 18%; font-size: 1.5rem; font-weight: bold; 
             color: var(--main-color); text-shadow: 0 0 15px black; 
-            z-index: 15; width: 80%; text-align: center; font-family: sans-serif; display: none;
+            z-index: 15; width: 85%; text-align: center; font-family: sans-serif; 
+            display: none; pointer-events: none; transition: opacity 0.5s;
         }
 
-        /* Botón Captura y GitHub */
+        /* Floating UI Tools */
         #ui-tools {
-            position: absolute; bottom: 20px; right: 20px; display: flex; gap: 15px; z-index: 100; opacity: 0.7;
+            position: absolute; bottom: 20px; width: 100%; display: none;
+            justify-content: center; gap: 10px; z-index: 100; transition: opacity 0.5s;
         }
         .tool-icon { 
-            cursor: pointer; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 50%; 
-            border: 1px solid var(--main-color); font-size: 1.2rem; text-decoration: none; color: white;
+            cursor: pointer; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 50%; 
+            border: 2px solid var(--main-color); font-size: 1.2rem; text-decoration: none; color: white;
+            box-shadow: 0 0 10px rgba(251, 255, 0, 0.3);
+            display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px;
+            transition: all 0.3s ease;
         }
+        .tool-icon:hover { transform: scale(1.1); box-shadow: 0 0 15px var(--main-color); }
 
-        /* Lluvia de Emojis */
-        .emoji { position: absolute; top: -50px; font-size: 2.5rem; animation: fall linear infinite; z-index: 1; }
-        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+        /* Overlays */
+        #letter-overlay {
+            position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.95);
+            z-index: 200; display: none; flex-direction: column; justify-content: center; align-items: center;
+            padding: 30px; box-sizing: border-box;
+        }
+        #letter-content { color: #00ff00; font-family: 'Courier New', monospace; font-size: 0.9rem; text-align: left; max-width: 500px; white-space: pre-wrap; overflow-y: auto; max-height: 60vh; }
+
+        /* Animación de error de Input */
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
+        .input-error { animation: shake 0.3s ease-in-out; border-color: #ff3333 !important; }
+
+        /* AI Loading indicator */
+        .ai-loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(251, 255, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--main-color);
+            animation: spin 1s linear infinite;
+            margin-right: 10px; vertical-align: middle;
+        }
 
     </style>
 </head>
 <body id="main-body">
 
+    <!-- Fondo de estrellas para las primeras pantallas -->
+    <div class="bg-stars"></div>
+
     <div id="status-bar">
-        <span>ST_SYSTEM_V3.0 // 2026</span>
+        <span>CJ7_CORE_v7.5 // OFFLINE_MODE</span>
         <span id="clock">00:00:00</span>
     </div>
 
+    <!-- S1: INICIO -->
     <div id="s1" class="screen active">
-        <div class="terminal blink" onclick="go(2)">> [INICIAR PROTOCOLO 21/03] <</div>
+        <div class="glass-panel" onclick="go(2)" style="cursor: pointer;">
+            <h1 style="color: var(--main-color); margin: 0 0 5px 0; text-shadow: 0 0 15px rgba(251, 255, 0, 0.5); font-family: 'Segoe UI', sans-serif; letter-spacing: 2px;">🌻 21 DE MARZO</h1>
+            <p style="color: #aaa; font-size: 0.8rem; margin-top: 0; margin-bottom: 30px; letter-spacing: 1px;">[ EDICIÓN VAN GOGH ]</p>
+            <div class="terminal blink" style="font-weight: bold;">> TOCA PARA INICIAR <</div>
+        </div>
     </div>
 
+    <!-- S2: IDENTIFICACIÓN -->
     <div id="s2" class="screen">
-        <div class="terminal">IDENTIFÍQUESE:</div>
-        <input type="text" id="name" placeholder="Tu Nombre..." autocomplete="off">
-        <button class="btn" onclick="analizar()">VERIFICAR</button>
+        <div class="glass-panel">
+            <h3 style="color: white; font-family: sans-serif; margin-top: 0;">IDENTIFICACIÓN</h3>
+            <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 20px;">Calibrando estrellas. Ingresa tu nombre:</p>
+            <input type="text" id="name" placeholder="Tu nombre..." autocomplete="off">
+            <button class="btn" onclick="analizar()">VERIFICAR</button>
+        </div>
     </div>
 
+    <!-- S3: ESPERA -->
     <div id="s3" class="screen">
-        <div id="log" class="terminal" style="font-size: 0.8rem; text-align: left; width: 80%;"></div>
-        <div class="progress-box"><div id="bar" class="bar"></div></div>
+        <div class="glass-panel">
+            <div class="ai-loader" style="margin-bottom: 15px; width: 30px; height: 30px; border-width: 3px;"></div>
+            <div id="log" class="terminal" style="font-size: 0.75rem; text-align: left; width: 100%; color: #ddd;"></div>
+            <div class="progress-box"><div id="bar" class="bar"></div></div>
+        </div>
     </div>
 
+    <!-- S4: LISTO -->
     <div id="s4" class="screen">
-        <div class="terminal" style="margin-bottom:30px;">ACCESO CONCEDIDO</div>
-        <div id="play-btn" style="font-size: 5rem; cursor:pointer;" onclick="final()">🌻</div>
+        <div class="glass-panel">
+            <div class="terminal" style="margin-bottom:10px; font-weight: bold; font-size: 1.2rem;">> ACCESO CONCEDIDO <</div>
+            <p style="color: #aaa; font-size: 0.85rem; margin-bottom: 30px;">El sistema está listo para ti.</p>
+            <div id="play-btn" style="font-size: 5rem; cursor:pointer; text-shadow: 0 0 20px rgba(251,255,0,0.6); transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onclick="final()">🌻</div>
+        </div>
     </div>
 
+    <!-- S5: PANTALLA FINAL -->
     <div id="s5" class="screen">
         <canvas id="finale-canvas"></canvas>
         <div id="final-msg"></div>
     </div>
 
-    <div id="ui-tools" style="display: none;">
-        <div class="tool-icon" onclick="screenshotMode()" title="Modo Captura">📸</div>
-        <a href="https://github.com/Cj7-Legendario" target="_blank" class="tool-icon" title="GitHub Repo">🔗</a>
+    <!-- HERRAMIENTAS -->
+    <div id="ui-tools">
+        <div class="tool-icon" onclick="screenshotMode()" title="Captura">📸</div>
+        <div class="tool-icon" onclick="generateAI()" title="Dedicatoria ✨">✨</div>
+        <div class="tool-icon" onclick="toggleLetter()" title="Mensaje Secreto">✉️</div>
+        <div class="tool-icon" onclick="shareProject()" title="Compartir">🔗</div>
+        <a href="https://github.com/Cj7-Legendario" target="_blank" class="tool-icon" style="text-decoration: none;">📁</a>
     </div>
 
-    <audio id="audio" src="musica.mp3"></audio>
+    <!-- MENSAJES IA Y CARTA -->
+    <div id="letter-overlay">
+        <div id="letter-content"></div>
+        <br>
+        <button class="btn" style="font-size: 0.7rem;" onclick="closeOverlays()">[CERRAR]</button>
+    </div>
+
+    <audio id="audio" src="musica.mp3" loop></audio>
 
     <script>
+        // Poemas predeterminados de Vincent Van Gogh (Simulación IA)
+        const poemasPredeterminados = [
+            "Tus ojos brillan como girasoles en la noche.\nCada palabra tuya es una pincelada de luz eterna.\n🌻✨",
+            "En cada chispa que despides veo las estrellas de Arlés.\nEres el lienzo donde pinto mis sueños más profundos.\n🌟💛",
+            "Como los girasoles siguen al sol, mi corazón te sigue a ti.\nEres la primavera que ilumina mis noches oscuras.\n🌼✨",
+            "Tus sueños son flores que nunca se marchitan.\nEn tu luz encuentro el sentido de toda mi existencia.\n💛🌻",
+            "Eres la constelación que guía mis pinceles.\nCada suspiro tuyo es un color nuevo en mi paleta.\n✨🎨"
+        ];
+
         let nombre = "";
         const audio = document.getElementById('audio');
-        const mainBody = document.getElementById('main-body');
         const canvas = document.getElementById('finale-canvas');
         const ctx = canvas.getContext('2d');
         const imgRamo = new Image();
         imgRamo.src = 'ramo.png'; 
 
-        // Reloj en tiempo real
+        let isScreenshot = false;
+        let isLetterOpen = false;
+        let particles = [];
+        let trail = [];
+
+        // Mensajes de carga
+        const loadingMsgs = [
+            "> Conectando a GitHub/Cj7-Legendario...",
+            "> Descargando pinceles de Van Gogh...",
+            "> Sincronizando Girasoles Eternos...",
+            "> Iniciando Protocolo de Renderizado...",
+            "> Analizando luz de primavera...",
+            "> Todo listo. Disfruta el 21 de Marzo."
+        ];
+
+        // Reloj Superior
         setInterval(() => {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString();
         }, 1000);
 
-        function setCanvasSize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        function setCanvasSize() { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+        }
         window.addEventListener('resize', setCanvasSize);
         setCanvasSize();
 
@@ -135,73 +253,206 @@
         }
 
         function analizar() {
-            nombre = document.getElementById('name').value;
-            if(!nombre) return alert("Ingresa tu nombre xd");
-            mainBody.style.background = "var(--process-bg)";
+            const inputElement = document.getElementById('name');
+            nombre = inputElement.value.trim();
+            if(!nombre) {
+                // Animación Shake de error
+                inputElement.classList.add('input-error');
+                setTimeout(() => inputElement.classList.remove('input-error'), 300);
+                return;
+            }
             go(3);
             let p = 0;
-            let bar = document.getElementById('bar');
-            let log = document.getElementById('log');
-            let msgs = ["> Localizando Ramo...", "> Saltando Firewalls...", "> Cj7-Legendario Repo Found...", "> DONE."];
-            let int = setInterval(() => {
+            const bar = document.getElementById('bar');
+            const log = document.getElementById('log');
+            const int = setInterval(() => {
                 p++;
                 bar.style.width = p + "%";
-                if(p % 25 == 0) log.innerHTML += msgs[p/25 - 1] + "<br>";
-                if(p >= 100) { clearInterval(int); setTimeout(() => go(4), 500); }
+                if(p % 17 == 0 && (p/17) <= loadingMsgs.length) log.innerHTML += loadingMsgs[Math.floor(p/17) - 1] + "<br>";
+                if(p >= 100) { clearInterval(int); setTimeout(() => go(4), 600); }
             }, 30);
         }
 
         function final() {
             go(5);
-            audio.play().catch(e=>console.log("Audio block"));
+            audio.play().catch(() => console.log("El audio requiere interacción previa"));
             document.getElementById('ui-tools').style.display = 'flex';
-            revelarRamo();
-            for(let i=0; i<40; i++) {
-                setTimeout(() => {
-                    let e = document.createElement('div');
-                    e.className = 'emoji';
-                    e.innerHTML = ['🌻','🌼','✨'][Math.floor(Math.random()*3)];
-                    e.style.left = Math.random() * 100 + "vw";
-                    e.style.animationDuration = (Math.random() * 2 + 3) + "s";
-                    mainBody.appendChild(e);
-                }, i * 150);
+            // Escondemos las estrellas CSS para que el canvas tome control
+            document.querySelector('.bg-stars').style.display = 'none';
+            initParticles();
+            renderLoop();
+        }
+
+        function initParticles() {
+            for(let i=0; i<50; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 1,
+                    vy: Math.random() * 2 + 1,
+                    size: Math.random() * 2 + 1,
+                    color: '#fbff00'
+                });
             }
         }
 
-        let currentRadius = 0;
-        function revelarRamo() {
-            let maxRadius = Math.max(canvas.width, canvas.height) * 0.7;
-            function anim() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+        window.addEventListener('mousemove', (e) => createTrail(e.clientX, e.clientY));
+        window.addEventListener('touchmove', (e) => createTrail(e.touches[0].clientX, e.touches[0].clientY));
+
+        function createTrail(x, y) {
+            for(let i=0; i<3; i++) {
+                trail.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: (Math.random() - 0.5) * 4,
+                    alpha: 1,
+                    size: Math.random() * 5 + 2
+                });
+            }
+        }
+
+        let bouquetReveal = 0;
+        function renderLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.y += p.vy;
+                if(p.y > canvas.height) p.y = -10;
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = 0.3;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                ctx.fill();
+            });
+            trail.forEach((t, i) => {
+                t.x += t.vx; t.y += t.vy; t.alpha -= 0.02;
+                if(t.alpha <= 0) trail.splice(i, 1);
+                ctx.globalAlpha = t.alpha;
+                ctx.fillStyle = "#fbff00";
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, t.size, 0, Math.PI*2);
+                ctx.fill();
+            });
+            if(imgRamo.complete) {
+                ctx.globalAlpha = 1;
+                let scale = Math.min(canvas.width/imgRamo.width, canvas.height/imgRamo.height) * 0.85;
+                let w = imgRamo.width * scale;
+                let h = imgRamo.height * scale;
+                let x = (canvas.width - w)/2;
+                let y = (canvas.height - h)/2;
+                if(bouquetReveal < 1) bouquetReveal += 0.01;
                 ctx.save();
                 ctx.beginPath();
-                ctx.arc(canvas.width / 2, canvas.height / 2, currentRadius, 0, Math.PI * 2);
+                ctx.arc(canvas.width/2, canvas.height/2, Math.max(canvas.width, canvas.height) * bouquetReveal, 0, Math.PI*2);
                 ctx.clip();
-                let scale = Math.min(canvas.width / imgRamo.width, canvas.height / imgRamo.width) * 0.9;
-                let iw = imgRamo.width * scale, ih = imgRamo.height * scale;
-                ctx.drawImage(imgRamo, (canvas.width - iw)/2, (canvas.height - ih)/2, iw, ih);
-                ctx.restore();
-                currentRadius += maxRadius / 100;
-                if (currentRadius < maxRadius) requestAnimationFrame(anim);
-                else {
-                    const msg = document.getElementById('final-msg');
-                    msg.style.display = "block";
-                    msg.innerHTML = "¡FELIZ 21 DE MARZO,<br>" + nombre.toUpperCase() + "! 🌻✨";
+                if(isScreenshot) {
+                    ctx.shadowBlur = 40;
+                    ctx.shadowColor = "rgba(251, 255, 0, 0.8)";
                 }
+                ctx.drawImage(imgRamo, x, y, w, h);
+                ctx.restore();
             }
-            anim();
+            if(isScreenshot) drawCamWatermark();
+            const msg = document.getElementById('final-msg');
+            if(bouquetReveal >= 1 && !isScreenshot) {
+                msg.style.display = "block";
+                msg.innerHTML = `¡FELIZ 21 DE MARZO!,<br>${nombre.toUpperCase()} 🌻✨`;
+            } else {
+                msg.style.display = "none";
+            }
+            requestAnimationFrame(renderLoop);
+        }
+
+        function drawCamWatermark() {
+            ctx.save();
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const dateStr = "21 de Marzo, 2026";
+            ctx.textAlign = "right";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = "black";
+            ctx.font = "italic 18px 'Segoe UI', sans-serif";
+            ctx.fillText(dateStr, canvas.width - 25, canvas.height - 50);
+            ctx.font = "bold 24px 'Segoe UI', sans-serif";
+            ctx.fillText(timeStr, canvas.width - 25, canvas.height - 25);
+            ctx.textAlign = "left";
+            ctx.font = "12px 'Courier New'";
+            ctx.fillText("CJ7-LEGENDARIO REVELATION v7.5 // OFFLINE MODE", 25, canvas.height - 25);
+            ctx.restore();
         }
 
         function screenshotMode() {
+            isScreenshot = true;
             document.getElementById('ui-tools').style.opacity = '0';
             document.getElementById('status-bar').style.opacity = '0';
+            document.getElementById('final-msg').style.opacity = '0';
             setTimeout(() => {
-                alert("MODO CAPTURA: Tienes 5 segundos para tomar el screenshot 📸");
-            }, 100);
-            setTimeout(() => {
-                document.getElementById('ui-tools').style.opacity = '0.7';
+                isScreenshot = false;
+                document.getElementById('ui-tools').style.opacity = '1';
                 document.getElementById('status-bar').style.opacity = '1';
-            }, 5000);
+                document.getElementById('final-msg').style.opacity = '1';
+            }, 6000);
+        }
+
+        function toggleLetter() {
+            const overlay = document.getElementById('letter-overlay');
+            const content = document.getElementById('letter-content');
+            isLetterOpen = !isLetterOpen;
+            if(isLetterOpen) {
+                overlay.style.display = "flex";
+                content.innerHTML = "";
+                const text = `> DECRYPTING SECRET_NOTE.txt...\n\nHola ${nombre},\n\nQuería darte un detalle diferente este 21 de marzo. Estas flores no se marchitan porque están hechas de código y cariño.\n\nEspero que este ramo de Van Gogh te acompañe siempre.\n\nEres increíble.\n\n[FIN DEL ARCHIVO]`;
+                let i = 0;
+                const type = setInterval(() => {
+                    content.innerHTML += text[i];
+                    i++;
+                    if(i >= text.length) clearInterval(type);
+                }, 40);
+            } else {
+                overlay.style.display = "none";
+            }
+        }
+
+        // Funciones de Poemas Predeterminados (Simulación de IA)
+        async function generateAI() {
+            const overlay = document.getElementById('letter-overlay');
+            const content = document.getElementById('letter-content');
+            overlay.style.display = "flex";
+            content.innerHTML = `<div class="ai-loader"></div> Canalizando la luz de Arles...`;
+
+            // Simular pequeña pausa para efecto cinematográfico
+            await new Promise(res => setTimeout(res, 800));
+
+            const poema = poemasPredeterminados[Math.floor(Math.random() * poemasPredeterminados.length)];
+            
+            content.innerHTML = `> ✨ DEDICATORIA DE VINCENT ✨\n\n`;
+            let i = 0;
+            const type = setInterval(() => {
+                if (i < poema.length) {
+                    content.innerHTML = content.innerHTML.replace('█', '') + poema[i] + '█';
+                    i++;
+                } else {
+                    clearInterval(type);
+                    content.innerHTML = content.innerHTML.replace('█', ''); // Quitar cursor al final
+                }
+            }, 30);
+        }
+
+        function closeOverlays() {
+            document.getElementById('letter-overlay').style.display = "none";
+            isLetterOpen = false;
+        }
+
+        function shareProject() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Flores Amarillas Eternas 🌻',
+                    text: '¡Mira este detalle por el 21 de marzo!',
+                    url: window.location.href
+                });
+            } else {
+                alert("Enlace copiado: " + window.location.href);
+            }
         }
     </script>
 </body>
