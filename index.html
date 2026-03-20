@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SYSTEM 21/03 - BY CJ7-LEGENDARIO</title>
+    <style>
+        :root { --main-color: #fbff00; --bg-dark: #0a0a0a; --process-bg: #0d1117; }
+        
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--bg-dark); color: white;
+            font-family: 'Courier New', monospace;
+            overflow: hidden; display: flex; justify-content: center; align-items: center;
+        }
+
+        /* Barra de Estado Superior */
+        #status-bar {
+            position: absolute; top: 0; width: 100%; padding: 10px 20px;
+            display: flex; justify-content: space-between; box-sizing: border-box;
+            background: rgba(0,0,0,0.5); font-size: 0.8rem; color: var(--main-color);
+            border-bottom: 1px solid var(--main-color); z-index: 100;
+        }
+
+        .screen { 
+            display: none; position: absolute; width: 100%; height: 100%; 
+            flex-direction: column; justify-content: center; align-items: center; 
+            text-align: center; z-index: 10;
+        }
+        .active { display: flex; }
+
+        /* Estilo Consola */
+        .terminal { color: var(--main-color); padding: 20px; text-transform: uppercase; }
+        .blink { animation: blinker 0.8s infinite; cursor: pointer;}
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        input { 
+            background: transparent; border: 2px solid var(--main-color); 
+            color: white; padding: 15px; font-size: 1.2rem; outline: none; 
+            border-radius: 8px; margin-bottom: 20px; width: 70%; text-align: center;
+        }
+        .btn { 
+            background: transparent; border: 2px solid var(--main-color); color: var(--main-color); 
+            padding: 15px 30px; font-weight: bold; cursor: pointer; border-radius: 8px;
+            text-transform: uppercase; transition: 0.3s;
+        }
+        .btn:hover { background: var(--main-color); color: black; box-shadow: 0 0 20px var(--main-color); }
+
+        .progress-box { width: 80%; max-width: 300px; height: 12px; background: #222; border-radius: 10px; margin-top: 20px; overflow: hidden; border: 1px solid var(--main-color); }
+        .bar { width: 0%; height: 100%; background: var(--main-color); transition: width 0.1s linear; }
+
+        #finale-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
+        #final-msg { 
+            position: absolute; bottom: 12%; font-size: 1.8rem; font-weight: bold; 
+            color: var(--main-color); text-shadow: 0 0 15px black; 
+            z-index: 15; width: 80%; text-align: center; font-family: sans-serif; display: none;
+        }
+
+        /* Botón Captura y GitHub */
+        #ui-tools {
+            position: absolute; bottom: 20px; right: 20px; display: flex; gap: 15px; z-index: 100; opacity: 0.7;
+        }
+        .tool-icon { 
+            cursor: pointer; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 50%; 
+            border: 1px solid var(--main-color); font-size: 1.2rem; text-decoration: none; color: white;
+        }
+
+        /* Lluvia de Emojis */
+        .emoji { position: absolute; top: -50px; font-size: 2.5rem; animation: fall linear infinite; z-index: 1; }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+
+    </style>
+</head>
+<body id="main-body">
+
+    <div id="status-bar">
+        <span>ST_SYSTEM_V3.0 // 2026</span>
+        <span id="clock">00:00:00</span>
+    </div>
+
+    <div id="s1" class="screen active">
+        <div class="terminal blink" onclick="go(2)">> [INICIAR PROTOCOLO 21/03] <</div>
+    </div>
+
+    <div id="s2" class="screen">
+        <div class="terminal">IDENTIFÍQUESE:</div>
+        <input type="text" id="name" placeholder="Tu Nombre..." autocomplete="off">
+        <button class="btn" onclick="analizar()">VERIFICAR</button>
+    </div>
+
+    <div id="s3" class="screen">
+        <div id="log" class="terminal" style="font-size: 0.8rem; text-align: left; width: 80%;"></div>
+        <div class="progress-box"><div id="bar" class="bar"></div></div>
+    </div>
+
+    <div id="s4" class="screen">
+        <div class="terminal" style="margin-bottom:30px;">ACCESO CONCEDIDO</div>
+        <div id="play-btn" style="font-size: 5rem; cursor:pointer;" onclick="final()">🌻</div>
+    </div>
+
+    <div id="s5" class="screen">
+        <canvas id="finale-canvas"></canvas>
+        <div id="final-msg"></div>
+    </div>
+
+    <div id="ui-tools" style="display: none;">
+        <div class="tool-icon" onclick="screenshotMode()" title="Modo Captura">📸</div>
+        <a href="https://github.com/Cj7-Legendario" target="_blank" class="tool-icon" title="GitHub Repo">🔗</a>
+    </div>
+
+    <audio id="audio" src="musica.mp3"></audio>
+
+    <script>
+        let nombre = "";
+        const audio = document.getElementById('audio');
+        const mainBody = document.getElementById('main-body');
+        const canvas = document.getElementById('finale-canvas');
+        const ctx = canvas.getContext('2d');
+        const imgRamo = new Image();
+        imgRamo.src = 'ramo.png'; 
+
+        // Reloj en tiempo real
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString();
+        }, 1000);
+
+        function setCanvasSize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', setCanvasSize);
+        setCanvasSize();
+
+        function go(n) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('s' + n).classList.add('active');
+        }
+
+        function analizar() {
+            nombre = document.getElementById('name').value;
+            if(!nombre) return alert("Ingresa tu nombre xd");
+            mainBody.style.background = "var(--process-bg)";
+            go(3);
+            let p = 0;
+            let bar = document.getElementById('bar');
+            let log = document.getElementById('log');
+            let msgs = ["> Localizando Ramo...", "> Saltando Firewalls...", "> Cj7-Legendario Repo Found...", "> DONE."];
+            let int = setInterval(() => {
+                p++;
+                bar.style.width = p + "%";
+                if(p % 25 == 0) log.innerHTML += msgs[p/25 - 1] + "<br>";
+                if(p >= 100) { clearInterval(int); setTimeout(() => go(4), 500); }
+            }, 30);
+        }
+
+        function final() {
+            go(5);
+            audio.play().catch(e=>console.log("Audio block"));
+            document.getElementById('ui-tools').style.display = 'flex';
+            revelarRamo();
+            for(let i=0; i<40; i++) {
+                setTimeout(() => {
+                    let e = document.createElement('div');
+                    e.className = 'emoji';
+                    e.innerHTML = ['🌻','🌼','✨'][Math.floor(Math.random()*3)];
+                    e.style.left = Math.random() * 100 + "vw";
+                    e.style.animationDuration = (Math.random() * 2 + 3) + "s";
+                    mainBody.appendChild(e);
+                }, i * 150);
+            }
+        }
+
+        let currentRadius = 0;
+        function revelarRamo() {
+            let maxRadius = Math.max(canvas.width, canvas.height) * 0.7;
+            function anim() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(canvas.width / 2, canvas.height / 2, currentRadius, 0, Math.PI * 2);
+                ctx.clip();
+                let scale = Math.min(canvas.width / imgRamo.width, canvas.height / imgRamo.width) * 0.9;
+                let iw = imgRamo.width * scale, ih = imgRamo.height * scale;
+                ctx.drawImage(imgRamo, (canvas.width - iw)/2, (canvas.height - ih)/2, iw, ih);
+                ctx.restore();
+                currentRadius += maxRadius / 100;
+                if (currentRadius < maxRadius) requestAnimationFrame(anim);
+                else {
+                    const msg = document.getElementById('final-msg');
+                    msg.style.display = "block";
+                    msg.innerHTML = "¡FELIZ 21 DE MARZO,<br>" + nombre.toUpperCase() + "! 🌻✨";
+                }
+            }
+            anim();
+        }
+
+        function screenshotMode() {
+            document.getElementById('ui-tools').style.opacity = '0';
+            document.getElementById('status-bar').style.opacity = '0';
+            setTimeout(() => {
+                alert("MODO CAPTURA: Tienes 5 segundos para tomar el screenshot 📸");
+            }, 100);
+            setTimeout(() => {
+                document.getElementById('ui-tools').style.opacity = '0.7';
+                document.getElementById('status-bar').style.opacity = '1';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
